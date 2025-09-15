@@ -28,8 +28,6 @@ Discord bot written in Python using `discord.py`. It provides features for text-
 
 - `^help`: Sends an embedded message listing all commands and controls.
 
----
-
 ## Setup
 
 1. Clone the repository.
@@ -50,8 +48,6 @@ Discord bot written in Python using `discord.py`. It provides features for text-
    ```bash
    python bot.py
    ```
-
----
 
 ## Notes
 
