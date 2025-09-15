@@ -1,10 +1,8 @@
-# Fabio Discord Bot
+# Discord Bot
 
 ## Overview
 
-Fabio is a Discord bot written in Python using `discord.py`. It provides features for text-to-speech using Eleven Labs, music playback from YouTube, and voice channel management. Users can interact with Fabio using prefixed commands (`^`) and interactive buttons.
-
----
+Discord bot written in Python using `discord.py`. It provides features for text-to-speech using Eleven Labs, music playback from YouTube, and voice channel management. Users can interact with it using prefixed commands (`^`) and interactive buttons.
 
 ## Features
 
@@ -19,7 +17,7 @@ Fabio is a Discord bot written in Python using `discord.py`. It provides feature
 
 ### Music Playback
 
-- `^m <query>`: Plays music from YouTube. If a song is already playing, it is added to the queue.
+- `^m <song name>`: Plays music from YouTube. If some song is already playing, new one is added to the queue.
 - Buttons on "Now Playing" message:
   - **Play**: Restarts the current song.
   - **Stop**: Stops the current song.
@@ -59,11 +57,3 @@ Fabio is a Discord bot written in Python using `discord.py`. It provides feature
 
 - Make sure the bot has **privileged intents** enabled in the Discord developer portal (members, message content, and voice states).
 - Ensure `ffmpeg` and `opus` libraries are installed for voice playback.
-- Buttons may send ephemeral messages to users when performing actions to avoid spamming the channel.
-
----
-
-## License
-
-This project is open-source and free to use.
-
