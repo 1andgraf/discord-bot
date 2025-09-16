@@ -1,5 +1,7 @@
-discord.py>=2.3.0
-requests>=2.31.0
-yt-dlp>=2025.9.1
-python-dotenv>=1.0.0
-pydub>=0.25.1
+discord.py==2.3.2
+yt-dlp
+python-dotenv
+pydub
+requests
+speechrecognition
+pyaudio
