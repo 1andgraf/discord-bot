@@ -4,29 +4,18 @@
 
 Discord bot written in Python using `discord.py`. It provides features for text-to-speech using Eleven Labs, music playback from YouTube, and voice channel management. Users can interact with it using prefixed commands (`^`) and interactive buttons.
 
-## Features
-
-### Text-to-Speech
+## Commands
 
 - `^say <message>`: Converts text to speech via Eleven Labs and plays it in your voice channel.
-
-### Voice Channel Management
-
 - `^join`: Bot joins your current voice channel.
 - `^leave`: Bot leaves the voice channel.
-
-### Music Playback
-
 - `^m <song name>`: Plays music from YouTube. If some song is already playing, new one is added to the queue.
-- Buttons on "Now Playing" message:
-  - **Play**: Restarts the current song.
-  - **Stop**: Stops the current song.
-  - **Next**: Skips to the next song in the queue.
-  - **Leave**: Disconnects the bot from the voice channel.
-
-### Help
-
 - `^help`: Sends an embedded message listing all commands and controls.
+- `^serverinfo`: Gives info about server
+- `^poll <question>`: Creates a poll with reactions
+- `^meme`: Sends a random meme
+- `^r <num1> <num2>`: Gives a random number from num1 to num2
+- `^define <word>`: Gives a word definition from dictionary
 
 ## Setup
 
