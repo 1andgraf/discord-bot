@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 print(discord.opus.is_loaded()) 
 from pydub import AudioSegment
 from discord import Embed
+import random
 
 load_dotenv()
 
@@ -117,6 +118,88 @@ async def help(ctx):
     embed.add_field(name="^leave", value="Bot leaves the voice channel", inline=False)
     embed.add_field(name="^m <song name>", value="Plays music from YouTube (adds to queue if something is already playing)", inline=False)
     await ctx.send(embed=embed)
+    
+@bot.command()
+async def userinfo(ctx, member: discord.Member = None):
+    member = member or ctx.author
+    roles = [role.name for role in member.roles if role.name != "@everyone"]
+    embed = discord.Embed(title=f"User Info: {member}", color=discord.Color.blue())
+    embed.add_field(name="ID", value=member.id, inline=False)
+    embed.add_field(name="Joined Server", value=member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
+    embed.add_field(name="Roles", value=", ".join(roles) if roles else "None", inline=False)
+    embed.set_thumbnail(url=member.avatar.url if member.avatar else discord.Embed.Empty)
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def serverinfo(ctx):
+    guild = ctx.guild
+    roles = [role.name for role in guild.roles if role.name != "@everyone"]
+    embed = discord.Embed(title=f"Server Info: {guild.name}", color=discord.Color.green())
+    embed.add_field(name="ID", value=guild.id, inline=False)
+    embed.add_field(name="Member Count", value=guild.member_count, inline=False)
+    embed.add_field(name="Roles", value=", ".join(roles) if roles else "None", inline=False)
+    embed.set_thumbnail(url=guild.icon.url if guild.icon else discord.Embed.Empty)
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def poll(ctx, *, question):
+    embed = discord.Embed(title="Poll", description=question, color=discord.Color.orange())
+    msg = await ctx.send(embed=embed)
+    await msg.add_reaction("✅")
+    await msg.add_reaction("❌")
+
+@bot.command()
+async def meme(ctx):
+    import requests
+
+    subreddit = "memes"
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=50"
+    headers = {"User-Agent": "DiscordBot"}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        posts = [post for post in data["data"]["children"] if not post["data"]["over_18"]]
+        if posts:
+            post = random.choice(posts)["data"]
+            embed = discord.Embed(title=post["title"], url=f"https://reddit.com{post['permalink']}")
+            embed.set_image(url=post["url"])
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("Couldn't find a meme right now.")
+    else:
+        await ctx.send("Failed to fetch memes.")
+
+@bot.command()
+async def r(ctx, start: int, end: int):
+    if start > end:
+        await ctx.send("Start must be less than or equal to end.")
+        return
+    result = random.randint(start, end)
+    await ctx.send(f"🎲 {ctx.author.mention} rolled the dice: {result}")
+
+@bot.command()
+async def define(ctx, *, word):
+    import requests
+
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        try:
+            # Get first definition of the first meaning
+            definition = data[0]['meanings'][0]['definitions'][0]['definition']
+            example = data[0]['meanings'][0]['definitions'][0].get('example', None)
+
+            embed = discord.Embed(title=f"Definition: {word}", color=discord.Color.blue())
+            embed.add_field(name="Definition", value=definition, inline=False)
+            if example:
+                embed.add_field(name="Example", value=example, inline=False)
+            await ctx.send(embed=embed)
+        except (KeyError, IndexError):
+            await ctx.send(f"Could not parse definition for '{word}'.")
+    else:
+        await ctx.send(f"Word '{word}' not found in dictionary.")
 
 @bot.command()
 async def m(ctx, *, query):
