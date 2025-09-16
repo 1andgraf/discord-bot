@@ -2,20 +2,21 @@
 
 ## Overview
 
-Discord bot written in Python using `discord.py`. It provides features for text-to-speech using Eleven Labs, music playback from YouTube, and voice channel management. Users can interact with it using prefixed commands (`^`) and interactive buttons.
+Discord bot written in Python using `discord.py`. It provides features for text-to-speech using Eleven Labs, music playback from YouTube, and voice recognition. Users can interact with it using prefixed commands (`^`), interactive buttons and voice.
 
 ## Commands
 
-- `^say <message>`: Converts text to speech via Eleven Labs and plays it in your voice channel.
-- `^join`: Bot joins your current voice channel.
-- `^leave`: Bot leaves the voice channel.
-- `^m <song name>`: Plays music from YouTube. If some song is already playing, new one is added to the queue.
-- `^help`: Sends an embedded message listing all commands and controls.
-- `^serverinfo`: Gives info about server
-- `^poll <question>`: Creates a poll with reactions
-- `^meme`: Sends a random meme
-- `^r <num1> <num2>`: Gives a random number from num1 to num2
-- `^define <word>`: Gives a word definition from dictionary
+	1.	^say <message>– Convert text to speech and play it in your voice channel (Eleven Labs).
+	2.	^leave – Bot leaves the current voice channel.
+	3.	^help – Show a help embed listing all commands.
+	4.	^userinfo <nickname> – Show information about a user (ID, join date, roles, etc.).
+	5.	^serverinfo – Show information about the server (ID, member count, roles, etc.).
+	6.	^poll <question>– Create a poll with ✅ and ❌ reactions.
+	7.	^meme – Fetch and display a random meme from Reddit.
+	8.	^r <num1> <num2> – Make a random number between num1 and num2.
+	9.	^define <word> – Look up a dictionary definition.
+	10. ^m <title>– Play music from YouTube.
+	11. ^join – Join your voice channel and start listening for spoken commands
 
 ## Setup
 
