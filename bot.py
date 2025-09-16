@@ -13,6 +13,7 @@ print(discord.opus.is_loaded())
 from pydub import AudioSegment
 from discord import Embed
 import random
+import speech_recognition as sr
 
 load_dotenv()
 
@@ -41,44 +42,45 @@ async def say(ctx, *, message):
     if ctx.author.voice:
         channel = ctx.author.voice.channel
         vc = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+
         if vc is None or not vc.is_connected():
             vc = await channel.connect()
         elif vc.channel != channel:
             await vc.move_to(channel)
+        # ✅ If already connected to the right channel, reuse vc without reconnecting
+
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{TTS_VOICE_ID}"
         headers = {
             "xi-api-key": ELEVEN_LABS_API_KEY,
             "Content-Type": "application/json"
         }
-        data = {"text": message, "voice_settings": {"stability":0.0,"similarity_boost":1.0}, "format": "wav"}
+        data = {
+            "text": message,
+            "voice_settings": {"stability": 0.0, "similarity_boost": 1.0},
+            "format": "wav"
+        }
+
         response = requests.post(url, headers=headers, json=data)
         if response.status_code != 200:
             await ctx.send(f"Failed to generate speech: {response.status_code} {response.text}")
             return
+
         content_type = response.headers.get("Content-Type", "")
         if not content_type.startswith("audio"):
             await ctx.send("Received unexpected audio format.")
             return
+
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav_file:
             temp_wav_file.write(response.content)
             temp_wav_file_path = temp_wav_file.name
+
         audio_source = discord.FFmpegPCMAudio(temp_wav_file_path)
         vc.play(audio_source)
+
         while vc.is_playing():
             await asyncio.sleep(0.1)
+
         os.remove(temp_wav_file_path)
-    else:
-        await ctx.send("You need to be in a voice channel!")
-        
-@bot.command()
-async def join(ctx):
-    if ctx.author.voice:
-        channel = ctx.author.voice.channel
-        vc = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-        if vc is None or not vc.is_connected():
-            await channel.connect()
-        elif vc.channel != channel:
-            await vc.move_to(channel)
     else:
         await ctx.send("You need to be in a voice channel!")
 
@@ -347,5 +349,80 @@ async def m(ctx, *, query):
         vc.play(audio_source, after=play_next)
         vc.current_title = title
         await send_now_playing(title, url)
-        
+
+
+@bot.command()
+async def join(ctx):
+    """Bot joins voice channel and listens for spoken commands starting with 'Fabio'."""
+    if not ctx.author.voice:
+        await ctx.send("You need to be in a voice channel!")
+        return
+
+    channel = ctx.author.voice.channel
+    vc = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+    if vc is None or not vc.is_connected():
+        vc = await channel.connect()
+    elif vc.channel != channel:
+        await vc.move_to(channel)
+
+    await ctx.send("Fabio is now listening... Be quiet")
+
+    recognizer = sr.Recognizer()
+    mic = sr.Microphone()  # For local testing; Discord voice frames require decoding Opus
+
+    async def speech_loop():
+        while vc.is_connected():
+            # Placeholder: capture audio from Discord is needed here
+            # Currently using local microphone for demo purposes
+            with mic as source:
+                recognizer.adjust_for_ambient_noise(source)
+                try:
+                    audio = recognizer.listen(source, phrase_time_limit=5)
+                    text = recognizer.recognize_google(audio)
+                    
+                    
+                    if text.lower().startswith("fabio") or text.lower().startswith("unicorn") or text.lower().startswith("fabo"):
+                        command_text = text[5:].strip()
+                        await ctx.send(f"Detected: `{command_text}`")
+                        
+                        if command_text.lower() == "hello" or command_text.lower() == "rn hello":
+                            await say(ctx, message="hello my little friend!!!!! wanna flakes or something??")
+                        if command_text.lower() == "flakes" or command_text.lower() == "rn flakes":
+                            await say(ctx, message="oh shit, these flakes are only mine, he he")
+                        if command_text.lower() == "say" or command_text.lower() == "rn say":
+                            await say(ctx, message="What should I say?")
+
+                            def capture_followup():
+                                recognizer = sr.Recognizer()
+                                with sr.Microphone() as source:  # ✅ new instance, no nesting
+                                    recognizer.adjust_for_ambient_noise(source)
+                                    audio1 = recognizer.listen(source, timeout=3, phrase_time_limit=7)
+                                    return recognizer.recognize_google(audio1)
+
+                            try:
+                                text1 = await asyncio.to_thread(capture_followup)
+                                await ctx.send(f"Detected: `{text1}`")
+                                await say(ctx, message=text1)
+                            except sr.WaitTimeoutError:
+                                await ctx.send("I didn’t hear anything.")
+                            except sr.UnknownValueError:
+                                await ctx.send("I couldn’t understand what you said.")
+                            except sr.RequestError as e:
+                                await ctx.send(f"Speech recognition failed: {e}")
+                        if command_text.lower() == "leave" or command_text.lower() == "rn leave" or command_text.lower() == "rn leaf" or command_text.lower() == "rn live":
+                                if vc and vc.is_connected():
+                                    await vc.disconnect()
+                                else:
+                                    await ctx.send("I'm not in a voice channel.")
+                            
+                except sr.WaitTimeoutError:
+                    continue
+                except sr.UnknownValueError:
+                    continue
+                except sr.RequestError as e:
+                    await ctx.send(f"Speech recognition failed: {e}")
+            await asyncio.sleep(0.1)
+
+    asyncio.create_task(speech_loop())
+
 bot.run(BOT_TOKEN)
