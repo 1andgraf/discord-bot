@@ -47,7 +47,6 @@ async def say(ctx, *, message):
             vc = await channel.connect()
         elif vc.channel != channel:
             await vc.move_to(channel)
-        # ✅ If already connected to the right channel, reuse vc without reconnecting
 
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{TTS_VOICE_ID}"
         headers = {
@@ -189,7 +188,6 @@ async def define(ctx, *, word):
     if response.status_code == 200:
         data = response.json()
         try:
-            # Get first definition of the first meaning
             definition = data[0]['meanings'][0]['definitions'][0]['definition']
             example = data[0]['meanings'][0]['definitions'][0].get('example', None)
 
@@ -368,12 +366,10 @@ async def join(ctx):
     await ctx.send("Fabio is now listening... Be quiet")
 
     recognizer = sr.Recognizer()
-    mic = sr.Microphone()  # For local testing; Discord voice frames require decoding Opus
+    mic = sr.Microphone()
 
     async def speech_loop():
         while vc.is_connected():
-            # Placeholder: capture audio from Discord is needed here
-            # Currently using local microphone for demo purposes
             with mic as source:
                 recognizer.adjust_for_ambient_noise(source)
                 try:
@@ -394,7 +390,7 @@ async def join(ctx):
 
                             def capture_followup():
                                 recognizer = sr.Recognizer()
-                                with sr.Microphone() as source:  # ✅ new instance, no nesting
+                                with sr.Microphone() as source:
                                     recognizer.adjust_for_ambient_noise(source)
                                     audio1 = recognizer.listen(source, timeout=3, phrase_time_limit=7)
                                     return recognizer.recognize_google(audio1)
