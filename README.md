@@ -2,7 +2,7 @@
 
 ## Overview
 
-Discord bot written in Python using `discord.py`. It provides features for text-to-speech using Eleven Labs, music playback from YouTube, and voice recognition. Users can interact with it using prefixed commands (`^`), interactive buttons and voice.
+Discord bot written in Python using `discord.py`. It provides features for text-to-speech using Eleven Labs, music playback, and voice recognition. Interact with it using commands (`^`), buttons and voice.
 
 ## Commands
 
